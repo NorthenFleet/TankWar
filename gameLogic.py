@@ -9,10 +9,10 @@ from map import Map
 
 
 class GameLogic:
-    def __init__(self,render):
+    def __init__(self, render):
         self.map = Map()
         self.clock = pygame.time.Clock()
-        
+
         self.player_tank = Tank("player_tank", CON.GREEN, 100, 100)
         self.enemy_tanks = self.create_enemy_tanks()
         self.state = State()
@@ -39,7 +39,7 @@ class GameLogic:
     def run(self):
         running = True
         while running:
-            enemy_bullets = []
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -53,11 +53,11 @@ class GameLogic:
                 self.handle_player_input()
                 self.award()
                 state = self.update_game_state()
-                self.game_render.display(self.game_over,self.state,self.map)
+                self.game_render.display(self.game_over, self.state, self.map)
                 if state == CON.GAME_STATE_MAIN:
                     return CON.GAME_STATE_MAIN
-                
-            self.clock.tick(6)#6
+
+            self.clock.tick(6)  # 6
 
     def get_tile_color(self, tile_type):
         """根据地图单元类型获取颜色。"""
@@ -136,6 +136,7 @@ class GameLogic:
     def quit_game():
         pygame.quit()
         sys.exit()
+
 
 class State:
     def __init__(self):

@@ -1,0 +1,12 @@
+service GameService {
+  rpc GameChannel(stream ActionRequest) returns (stream GameResponse) {}
+}
+
+message ActionRequest {
+  string action = 1; // 动作：上、下、左、右、开火
+}
+
+message GameResponse {
+  string status = 1; // 游戏状态
+  // 其他游戏状态信息
+}

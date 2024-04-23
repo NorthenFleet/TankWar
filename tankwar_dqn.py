@@ -20,7 +20,11 @@ class DQNNetwork(nn.Module):
         x = self.relu(self.fc2(x))
         return self.output_layer(x)
 
-
+class Qmap:
+    def __init__(self):
+        
+        self.model = DQNNetwork(1, 1)
+        
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
@@ -65,11 +69,11 @@ class DQNAgent:
 
     def train(self, env, episodes, batch_size=32):
         for e in range(episodes):
-            state = env.reset()[0]
+            state = env.reset()[0]  # 返回状态信息：
             state = np.reshape(state, [1, self.state_size])
             for time in range(200):
                 action = self.act(state)
-                next_state, reward, done, _, _ = env.step(action)
+                next_state, reward, done, _, _ = env.step(action)  # 环境进行下一步交互
                 reward = reward if not done else -10
                 next_state = np.reshape(next_state, [1, self.state_size])
                 self.remember(state, action, reward, next_state, done)
@@ -105,8 +109,8 @@ class DQNAgent:
 
 
 if __name__ == "__main__":
-    mode = 'test'  # 'train' or 'test'
-   # mode = 'train'  # 'train' or 'test'
+   # mode = 'test'  # 'train' or 'test'
+    mode = 'train'  # 'train' or 'test'
     name = 'CartPole-v1'
     episodes = 100
     if mode == 'train':
@@ -114,8 +118,8 @@ if __name__ == "__main__":
     else:
         env = gym.make(name, render_mode="human")
 
-    state_size = env.observation_space.shape[0]
-    action_size = env.action_space.n
+    state_size = env.observation_space.shape[0]  # 状态数量
+    action_size = 5  #决策数量
     agent = DQNAgent(state_size, action_size)
 
     if mode == 'train':

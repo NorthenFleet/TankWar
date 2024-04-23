@@ -9,34 +9,19 @@ from map import Map
 
 
 class GameLogic:
-    def __init__(self, screen, game_surface, bottom_surface):
-        self.screen = screen
-        self.game_surface = game_surface
-        self.bottom_surface = bottom_surface
+    def __init__(self,render):
         self.map = Map()
-        self.map_tiles_images = self.load_tiles()
         self.clock = pygame.time.Clock()
-        self.enemy_tanks = self.create_enemy_tanks()
+        
         self.player_tank = Tank("player_tank", CON.GREEN, 100, 100)
+        self.enemy_tanks = self.create_enemy_tanks()
+        self.state = State()
+        self.state.enemy_tanks = self.enemy_tanks
+        self.state.player_tanks = self.player_tank
         self.all_tanks = [self.player_tank] + self.enemy_tanks
         self.game_over = False
         self.time_count = 0
-        self.player_tanks_count = 1
-
-    def load_tiles(self):
-        tiles_images = {
-            CON.TileType_NONE: pygame.image.load('images/geo/None.png').convert_alpha(),
-            CON.TileType_FIELD: pygame.image.load('images/geo/Field.png').convert_alpha(),
-            CON.TileType_RIVER: pygame.image.load('images/geo/River.png').convert_alpha(),
-            CON.TileType_SAND: pygame.image.load('images/geo/Sand.png').convert_alpha(),
-            CON.TileType_BRICK_WALL: pygame.image.load('images/geo/Brick.png').convert_alpha(),
-            CON.TileType_STONE_WALL: pygame.image.load(
-                'images/geo/Stone.png').convert_alpha()
-        }
-        for tile_type, image in tiles_images.items():
-            tiles_images[tile_type] = pygame.transform.scale(
-                image, (CON.GRID_SIZE, CON.GRID_SIZE))
-        return tiles_images
+        self.game_render = render
 
     def load_map(self, map):
         self.map.load_map(map)
@@ -54,10 +39,6 @@ class GameLogic:
     def run(self):
         running = True
         while running:
-            self.screen.fill(CON.BLACK)
-            self.game_surface.fill(CON.BLACK)
-            self.bottom_surface.fill(CON.GRAY)
-            self.render_map()
             enemy_bullets = []
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -72,31 +53,11 @@ class GameLogic:
                 self.handle_player_input()
                 self.award()
                 state = self.update_game_state()
+                self.game_render.display(self.game_over,self.state,self.map)
                 if state == CON.GAME_STATE_MAIN:
                     return CON.GAME_STATE_MAIN
-                self.render_game_objects()
-
-            self.draw_bottom_surface(self.bottom_surface)
-
-            self.screen.blit(self.game_surface, (0, 0))
-            self.screen.blit(self.bottom_surface, (0, CON.MAP_HEIGHT))
-
-            pygame.display.flip()
-            self.clock.tick(6)
-
-    def draw_bottom_surface(self, surface):
-        # # 在这里绘制辅助信息，如状态指示器、分数板等
-
-        font = pygame.font.SysFont(None, 24)
-        text_surfaces = [
-            font.render(f"Count of Enemy Tank: {len(self.enemy_tanks)}",
-                        True, (255, 255, 255)),
-            font.render(f"Count of Player Tank: {self.player_tanks_count}",
-                        True, (255, 255, 255)),
-        ]
-        for i, text_surface in enumerate(text_surfaces):
-            surface.blit(
-                text_surface, (10, 10 + i * 30))
+                
+            self.clock.tick(6)#6
 
     def get_tile_color(self, tile_type):
         """根据地图单元类型获取颜色。"""
@@ -107,15 +68,6 @@ class GameLogic:
             # 其他地图元素类型...
         }
         return tile_colors.get(tile_type, CON.DEFAULT_COLOR)  # 默认颜色
-
-    def render_map(self):
-        """遍历地图数据并在game_surface上绘制地图。"""
-        for y, row in enumerate(self.map.tiles):
-            for x, tile_type in enumerate(row):
-                tile_image = self.map_tiles_images.get(tile_type)
-                if tile_image:
-                    self.game_surface.blit(
-                        tile_image, (x * CON.GRID_SIZE, y * CON.GRID_SIZE))
 
     def award(self):
         self.time_count += 1
@@ -163,11 +115,6 @@ class GameLogic:
         if bmy_Died == True:
             return CON.GAME_STATE_MAIN
 
-    def render_game_objects(self):
-        for tank in self.enemy_tanks:
-            tank.draw(self.game_surface)
-        self.player_tank.draw(self.game_surface)
-
     def destroy_tanks(self):
         bullets_to_remove = []  # 用于存储需要删除的子弹
         for i, tank in reversed(list(enumerate(self.enemy_tanks))):
@@ -189,3 +136,8 @@ class GameLogic:
     def quit_game():
         pygame.quit()
         sys.exit()
+
+class State:
+    def __init__(self):
+        self.player_tanks = []
+        self.enemy_tanks = []

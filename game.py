@@ -3,6 +3,7 @@ import os
 from gameLogic import GameLogic
 from map import Map, Button, MapEdit
 from config import CON
+from render import Render
 
 
 class Game:
@@ -28,9 +29,9 @@ class Game:
         self.selected_map = "maps/level1.txt"
         self.map_edit = MapEdit(
             self.screen, self.game_surface,  self.bottom_surface)
-        self.game_logic = GameLogic(
-            self.screen, self.game_surface, self.bottom_surface)
-
+        render = Render(self.screen, self.game_surface, self.bottom_surface)
+        self.game_logic = GameLogic(render)
+        
         self.selected_map_index = None
         self.last_selected_map_index = -1
         self.font = pygame.font.SysFont(None, 24)

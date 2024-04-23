@@ -14,17 +14,9 @@ class Tank:
         self.shoot_interval = 30
         self.shoot_current = 0
         self.current_level = CON.TANK_LEVEL1
-        self.image = self.load_image()  # 加载坦克图片
-        self.rect = self.image.get_rect(topleft=(x, y))  # 更新rect以匹配图片大小
-
-    def load_image(self):
-        # 根据坦克类型和级别构建图片文件名
-        # image_name = f'tank_{self.tank_type}_level{self.level}.png'
-        image_name = f'{self.name}.png'
-        # 加载图片
-        image = pygame.image.load(f'images/{image_name}').convert_alpha()
-        image = pygame.transform.scale(image, (CON.GRID_SIZE, CON.GRID_SIZE))
-        return image
+    
+    def get_position(self):
+        return self.rect.centerx,self.rect.centery
 
     def get_rotation_angle(self):
         if self.direction == 'up':
@@ -38,7 +30,7 @@ class Tank:
         return 0  # 默认不旋转
 
     def move(self, all_tanks, map_data):
-        new_rect = self.rect.copy()
+        new_rect = self.rect.copy()#待定
         if self.direction == 'up':
             new_rect.y -= CON.TANK_SPEED
         elif self.direction == 'down':
@@ -84,22 +76,6 @@ class Tank:
             if bullet.b_outside():
                 self.bullets.remove(bullet)
 
-    def draw(self, surface):
-        # pygame.draw.rect(surface, self.color, self.rect)
-        # 获取旋转角度
-        angle = self.get_rotation_angle()
-        # 旋转图片
-        rotated_image = pygame.transform.rotate(self.image, angle)
-        # 更新rect以确保图片居中
-        new_rect = rotated_image.get_rect(center=self.rect.center)
-        # 使用旋转后的图片和新的rect绘制坦克
-        surface.blit(rotated_image, new_rect.topleft)
-        self.draw_bullets(surface)
-
-    def draw_bullets(self, surface):
-        for bullet in self.bullets:
-            bullet.draw(surface)
-
     def move_random(self, all_tanks, tiles):
         # 随机改变坦克的方向或者继续前进
         if random.randint(0, 3) == 0:  # 有大约25%的概率改变方向
@@ -141,9 +117,6 @@ class Bullet:
             self.rect.x -= self.speed
         elif self.direction == 'right':
             self.rect.x += self.speed
-
-    def draw(self, surface):
-        pygame.draw.rect(surface, CON.WHITE, self.rect)
 
     # 子弹出界，要删除子弹
     def b_outside(self):

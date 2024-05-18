@@ -6,7 +6,6 @@ import torch.optim as optim
 import random
 from collections import deque
 
-
 class DQNNetwork(nn.Module):
     def __init__(self, state_size, action_size):
         super(DQNNetwork, self).__init__()

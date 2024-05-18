@@ -12,9 +12,8 @@ class GameLogic:
     def __init__(self, render):
         self.map = Map()
         self.clock = pygame.time.Clock()
-
         self.player_tank = Tank("player_tank", CON.GREEN, 100, 100)
-        self.enemy_tanks = self.create_enemy_tanks()
+        self.enemy_tanks = []
         self.state = State()
         self.state.enemy_tanks = self.enemy_tanks
         self.state.player_tanks = self.player_tank
@@ -22,6 +21,9 @@ class GameLogic:
         self.game_over = False
         self.time_count = 0
         self.game_render = render
+
+    def initialize(self):
+        self.enemy_tanks = self.create_enemy_tanks()
 
     def load_map(self, map):
         self.map.load_map(map)

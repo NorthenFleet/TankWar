@@ -34,12 +34,40 @@ def draw_map(screen, map_data, hex_size):
             draw_hex(screen, center, hex_size, color)
 
 
+def load_hex_images(hex_size):
+    # 假设你有两种类型的六角形图像，一种用于条件0，一种用于条件1
+    # 图像应已预先缩放到合适的尺寸
+    alphat = 1.75
+    belt = 1.5
+    return {
+        0: pygame.transform.scale(pygame.image.load('images/sex_geo/city.png').convert_alpha(), (alphat*hex_size, belt*hex_size)),
+        1: pygame.transform.scale(pygame.image.load('images/sex_geo/conlin.png').convert_alpha(), (alphat*hex_size, belt*hex_size)),
+        2: pygame.transform.scale(pygame.image.load('images/sex_geo/sand.png').convert_alpha(), (alphat*hex_size, belt*hex_size)),
+        3: pygame.transform.scale(pygame.image.load('images/sex_geo/sand1.png').convert_alpha(), (alphat*hex_size, belt*hex_size)),
+        4: pygame.transform.scale(pygame.image.load('images/sex_geo/sand2.png').convert_alpha(), (alphat*hex_size, belt*hex_size))
+    }
+
+
+def draw_map(screen, map_data, hex_images, hex_size):
+    for hex_row in map_data:
+        for hex_data in hex_row:
+            x = hex_data['pos'] % 100
+            y = hex_data['pos'] % len(map_data[1])
+            center = get_hex_center(x, y, hex_size)
+            hex_image = hex_images[hex_data['cond']]
+            # Here we need to adjust the position to blit the image correctly
+            hex_rect = hex_image.get_rect(center=center)
+            screen.blit(hex_image, hex_rect.topleft)
+
+
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((1800, 1000))
 
+with open('maps/basic.json', 'r') as f:
+    map_data = json.load(f)['map_data']
 
-map_data = load_map_data('maps/basic.json')
 hex_size = 20
+hex_images = load_hex_images(hex_size)
 
 running = True
 while running:
@@ -47,11 +75,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill((0, 0, 0))  # ����
+    screen.fill((0, 0, 0))
 
-    # ���Ƶ�ͼ
-    draw_map(screen, map_data, hex_size)
+    draw_map(screen, map_data, hex_images, hex_size)
 
-    pygame.display.flip()  # ������ʾ
+    pygame.display.flip()
 
 pygame.quit()
